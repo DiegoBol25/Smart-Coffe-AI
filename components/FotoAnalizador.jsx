@@ -7,7 +7,8 @@ import {
   StyleSheet, 
   ActivityIndicator,
   TouchableOpacity,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -95,50 +96,58 @@ const FotoAnalizador = ({ apiKey, modelName }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Analizador de Plantas de Café</Text>
-
-      <TouchableOpacity 
-        style={styles.imagePicker}
-        onPress={pickImage}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
       >
-        {image ? (
-          <Image 
-            source={{ uri: image.uri }} 
-            style={styles.image} 
-          />
-        ) : (
-          <Text style={styles.imagePickerText}>
-            Toca para seleccionar una imagen
-          </Text>
+        <Text style={styles.title}>Analizador de Plantas de Café</Text>
+
+        <TouchableOpacity 
+          style={styles.imagePicker}
+          onPress={pickImage}
+        >
+          {image ? (
+            <Image 
+              source={{ uri: image.uri }} 
+              style={styles.image} 
+            />
+          ) : (
+            <Text style={styles.imagePickerText}>
+              Toca para seleccionar una imagen
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        {image && (
+          <View style={styles.buttonContainer}>
+            <Button 
+              title={loading ? "Analizando..." : "Analizar Planta"}
+              onPress={analyzeImage}
+              disabled={loading}
+            />
+          </View>
         )}
-      </TouchableOpacity>
 
-      {image && (
-        <Button 
-          title={loading ? "Analizando..." : "Analizar Planta"}
-          onPress={analyzeImage}
-          disabled={loading}
-        />
-      )}
+        {loading && (
+          <ActivityIndicator 
+            size="large" 
+            color="#006400" 
+            style={styles.loader}
+          />
+        )}
 
-      {loading && (
-        <ActivityIndicator 
-          size="large" 
-          color="#006400" 
-          style={styles.loader}
-        />
-      )}
+        {error && (
+          <Text style={styles.errorText}>{error}</Text>
+        )}
 
-      {error && (
-        <Text style={styles.errorText}>{error}</Text>
-      )}
-
-      {diagnosis && (
-        <View style={styles.diagnosisContainer}>
-          <Text style={styles.diagnosisTitle}>Diagnóstico:</Text>
-          <Text style={styles.diagnosisText}>{diagnosis}</Text>
-        </View>
-      )}
+        {diagnosis && (
+          <View style={styles.diagnosisContainer}>
+            <Text style={styles.diagnosisTitle}>Diagnóstico:</Text>
+            <Text style={styles.diagnosisText}>{diagnosis}</Text>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -146,8 +155,14 @@ const FotoAnalizador = ({ apiKey, modelName }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f5f5f5',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40, // Espacio extra al final
   },
   title: {
     fontSize: 24,
@@ -173,6 +188,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 10,
+  },
+  buttonContainer: {
+    marginBottom: 20,
   },
   loader: {
     marginVertical: 20,
