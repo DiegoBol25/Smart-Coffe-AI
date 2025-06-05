@@ -20,6 +20,7 @@ const MODEL_NAME = "gemini-1.5-flash";
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
